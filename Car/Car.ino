@@ -33,19 +33,26 @@ void loop()
      //Serial.println(results.value, DEC);
      
      switch(results.value){
-       case 1033561079:
-         Serial.println("Turning on RTE1");
+       case 16718055:
+         Serial.println("Moving forward");
+         analogWrite(pwm_a, 100);  // Start slow
+         analogWrite(pwm_b, 0);
          break; 
-       case 1217346747:
-         Serial.println("Turning on BBC1");
+       case 16730805:
+         Serial.println("Moving backwards");
          break;
-         case 667707411:
-         Serial.println("Turning on 3e");
+        case 16716015:
+         Serial.println("Turning left");
+         digitalWrite(dir_b, LOW);
+         break;
+       case 16734885:
+         Serial.println("Turning right");
+         digitalWrite(dir_b, HIGH);
          break;
        default:
-         Serial.println("Sorry. I didn't understand.");
-         Serial.print("The IR code is ");
-         Serial.println(results.value);
+         //Serial.println("Sorry. I didn't understand.");
+         //Serial.print("The IR code is ");
+         //Serial.println(results.value);
        break;
      
     }
@@ -53,7 +60,7 @@ void loop()
   }
   // Serial code end
   
-  /*digitalWrite(dir_a, HIGH); 
+  digitalWrite(dir_a, HIGH); 
   digitalWrite(dir_b, LOW);  
   
   delay(5000);
@@ -119,7 +126,7 @@ void loop()
   
   analogWrite(pwm_a, 0); //Stop
   analogWrite(pwm_b, 0);
-*/
+
 }
 
 
