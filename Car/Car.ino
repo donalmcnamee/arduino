@@ -21,26 +21,41 @@ void setup()
   pinMode(dir_a, OUTPUT);
   pinMode(dir_b, OUTPUT);
   
-  analogWrite(pwm_a, 100);  //set both motors to run at (100/255 = 39)% duty cycle (slow)
+  //analogWrite(pwm_a, 100);  //set both motors to run at (100/255 = 39)% duty cycle (slow)
   //analogWrite(pwm_b, 100);
   
 }
 
 void loop()
 {
+
+  //analogWrite(pwm_a, 255);  //set both motors to run at (100/255 = 39)% duty cycle (slow)
+  //analogWrite(pwm_b, 255);
+  
   // Serial code begin 
   if(irrecv.decode(&results)){
      //Serial.println(results.value, DEC);
      
      switch(results.value){
-       case 16718055:
+       case 16718055: // A Quick Jab of the no. 2 button
          Serial.println("Moving forward");
+         analogWrite(pwm_a, 255);  // Start slow
+         delay(1000);
          analogWrite(pwm_a, 100);  // Start slow
-         analogWrite(pwm_b, 0);
+         delay(1000);
          break; 
+         
+       case 4294967295: // Holding down the no. 2 button
+         Serial.println("Moving forward (fast!)");
+         analogWrite(pwm_a, 255);  // Start slow
+         delay(1000);
+         break;
+         
        case 16730805:
          Serial.println("Moving backwards");
          break;
+
+         
         case 16716015:
          Serial.println("Turning left");
          digitalWrite(dir_b, LOW);
@@ -50,16 +65,16 @@ void loop()
          digitalWrite(dir_b, HIGH);
          break;
        default:
-         //Serial.println("Sorry. I didn't understand.");
-         //Serial.print("The IR code is ");
-         //Serial.println(results.value);
+         Serial.println("Sorry. I didn't understand.");
+         Serial.print("The IR code is ");
+         Serial.println(results.value);
        break;
      
     }
     irrecv.resume();
   }
   // Serial code end
-  
+  /*
   digitalWrite(dir_a, HIGH); 
   digitalWrite(dir_b, LOW);  
   
@@ -126,7 +141,7 @@ void loop()
   
   analogWrite(pwm_a, 0); //Stop
   analogWrite(pwm_b, 0);
-
+*/
 }
 
 
