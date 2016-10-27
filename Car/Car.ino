@@ -39,7 +39,7 @@ void loop()
      switch(results.value){
        case 16718055: // A Quick Jab of the no. 2 button
          Serial.println("Moving forward");
-         analogWrite(pwm_a, 255);  // Start slow
+         analogWrite(pwm_a, 255);  // Start fast
          delay(1000);
          analogWrite(pwm_a, 100);  // Start slow
          delay(1000);
@@ -60,10 +60,12 @@ void loop()
          Serial.println("Turning left");
          digitalWrite(dir_b, LOW);
          break;
+         
        case 16734885:
          Serial.println("Turning right");
          digitalWrite(dir_b, HIGH);
          break;
+         
        default:
          Serial.println("Sorry. I didn't understand.");
          Serial.print("The IR code is ");
