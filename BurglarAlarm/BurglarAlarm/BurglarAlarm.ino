@@ -1,21 +1,34 @@
-#include<IRremote.h>
-int RECV_PIN=11;
-IRrecv irrecv(RECV_PIN);
-decode_results results;
+int piezo=5;
+int movement=7;
+int movementstatus=0;
+int light=3;
 
+void setup(){
+  pinMode(piezo, OUTPUT);
+  pinMode(movement, INPUT);
+  pinMode(light, OUTPUT);
+    Serial.begin(9600);
+}
 
-void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(9600);
-  pinMode(13, OUTPUT);
-  irrecv.enableIRIn();
+void loop(){
+  movementstatus=digitalRead(movement);
   
+  if(movementstatus==HIGH){
+  
+      digitalWrite(piezo,HIGH);
+      digitalWrite(light,HIGH);
+      delay(2000);
+      digitalWrite(piezo,LOW);
+      digitalWrite(light,LOW);
+        delay(2000);
+      
+    }
+  else{
+      digitalWrite(piezo,LOW);
+      digitalWrite(light,LOW);
+  }
+    
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
-  if(irrecv.decode(&results)){
-     Serial.println(results.value, DEC);
-     irrecv.resume();
-  }
-}
+
+//Darragh was here
