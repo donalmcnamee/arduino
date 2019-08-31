@@ -1,32 +1,45 @@
 #include <OneWire.h>
 
-OneWire ibutton (2); // I button connected on PIN 2.
+// This is the pin with the 1-Wire bus on it
+OneWire ds(2);
 
-byte buffer[20]; //array to store the Ibutton ID.
+// unique serial number read from the key
+byte addr[8];
 
-void setup(){
- Serial.begin(9600); 
-   
+// poll delay (I think 750ms is a magic number for iButton)
+int del = 1000;
+
+// Teensy 2.0 has an LED on port 11
+int ledpin = 11;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(ledpin, OUTPUT);
 }
 
-void loop(){
-   
- if (!ibutton.search (buffer)){//read attached ibutton and asign value to buffer
-    ibutton.reset_search();
-    delay(200);
+void loop() {
+  byte result;
+
+  // search looks through all devices on the bus
+  ds.reset_search();
+
+  if(result = !ds.search(addr)) {
+    // Serial.println("Scanning...");
+  } else if(OneWire::crc8(addr, 7) != addr[7]) {
+    Serial.println("Invalid CRC");
+    delay(del);
     return;
- }
-  
-  for (int x = 0; x<8; x++){  
-    Serial.print(buffer[x],HEX); //print the buffer content in LSB. For MSB: for (int x = 8; x>0; x--) 
-     Serial.print(" "); // print a space
-   }
-   Serial.println("\n"); // print new line
-   
-   //crc compute//
-   byte crc;
-   crc = ibutton.crc8(buffer, 7);
-   Serial.println(crc,HEX);
- 
-     
-} 
+  } else {
+    for(byte i=0; i<8; i++) {
+      Serial.print(addr[i], HEX);
+      Serial.print(" ");
+    }
+    Serial.print("\n");
+    digitalWrite(ledpin, HIGH);
+    delay(1000);
+    digitalWrite(ledpin, LOW);
+  }
+
+  delay(del);
+  return;
+}
