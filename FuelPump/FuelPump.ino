@@ -103,74 +103,61 @@ void loop() {
   }
   else {
 
-    sprintf(dataStrings, "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X", addr[7], addr[6], addr[5], addr[4], addr[3], addr[2], addr[1], addr[0]);
-    Serial.print(dataStrings);
-    Serial.print("\n");
-    digitalWrite(ledpin, HIGH);
-    delay(1000);
-    digitalWrite(ledpin, LOW);
+	  sprintf(dataStrings, "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X", addr[7], addr[6], addr[5], addr[4], addr[3], addr[2], addr[1], addr[0]);
+	  Serial.print(dataStrings);
+	  Serial.print("\n");
+	  digitalWrite(ledpin, HIGH);
+	  delay(1000);
+	  digitalWrite(ledpin, LOW);
 
-    // Test the ID received against that of the DB.
 
-    // if there's incoming data from the net connection.
-      // send it out the serial port.  This is for debugging
-      // purposes only:
-    if (client.available()) {
-      char c = client.read();
-      Serial.write(c);
-    }
 
-    // if ten seconds have passed since your last connection,
-    // then connect again and send data:
-    if (millis() - lastConnectionTime > postingInterval) {
+	  
+	  //char jsonResponse[] = "[{\"name\":\"Donal McNamee\",\"fob_id\":\"DD:00:00:1A:95:9C:84:01\",\"id\":1}]";
+	  String jsonResponse = "";
+	  int statusCode = restClient.get("/users/1", &jsonResponse);
 
-		String jsonResponse = "";
-		int statusCode = restClient.get("/users/1", &jsonResponse);
-		Serial.print("Response from HAL: ");
-		Serial.println(jsonResponse);
 
-		DynamicJsonDocument doc(1024);
-		deserializeJson(doc, jsonResponse);
+	  // Allocate the JSON document
+	  // Use arduinojson.org/v6/assistant to compute the capacity.
+	  const size_t capacity = JSON_OBJECT_SIZE(3) + JSON_ARRAY_SIZE(2) + 60;
+	  DynamicJsonDocument doc(capacity);
 
-		const char* name = doc["name"];
-		const char* fob_id= doc["fob_id"];
-		int id = doc["id"];
-		Serial.print("Name: ");
-		Serial.println(name);
+	  // Parse JSON object
+	  DeserializationError error = deserializeJson(doc, jsonResponse);
+	  if (error) {
+		  Serial.print(F("deserializeJson() failed: "));
+		  Serial.println(error.c_str());
+		  return;
+	  }
+	  else {
+		  Serial.println("Successfully Deserialised");
+	  }
 
-		Serial.print("Fob ID: ");
-		Serial.println(fob_id);
-		
-		Serial.print("PostgreSQL ID: ");
-		Serial.println(id);
+	  Serial.print("Raw Response: ");
+	  Serial.println(jsonResponse);
 
-    }
+	  Serial.println(F("Response:"));
+	  Serial.println(doc["name"].as<char*>());
+	  Serial.println(doc["fob_id"].as<char*>());
+
+	  Serial.println(doc["id"].as<int>());
+	  
+	  Serial.println("Getting this far!");
+	  const char* name = doc["name"];
+	  const char* fob_id = doc["fob_id"];
+	  int id = doc["id"];
+
+	  Serial.print("Name: ");
+	  Serial.println(name);
+
+	  Serial.print("Fob ID: ");
+	  Serial.println(fob_id);
+
+	  Serial.print("PostgreSQL ID: ");
+	  Serial.println(id);
+
   }
 
-  delay(del);
-  return;
-}
 
-void httpRequest() {
-  // close any connection before send a new request.
-  // This will free the socket on the WiFi shield
-  client.stop();
-
-  // if there's a successful connection:
-  if (client.connect(server, 80)) {
-    Serial.println("connecting...");
-    // send the HTTP GET request:
-    client.println("GET /latest.txt HTTP/1.1");
-    client.println("Host: www.arduino.cc");
-    client.println("User-Agent: arduino-ethernet");
-    client.println("Connection: close");
-    client.println();
-
-    // note the time that the connection was made:
-    lastConnectionTime = millis();
-  }
-  else {
-    // if you couldn't make a connection:
-    Serial.println("connection failed");
-  }
 }
